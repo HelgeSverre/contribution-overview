@@ -1,6 +1,7 @@
 # GitHub Contributions Dashboard
 
-[![Try it Live](https://img.shields.io/badge/Try_it_Live-→-brightgreen?style=for-the-badge)](https://helgesverre.github.io/contribution-overview/)
+[![Try it Live](https://img.shields.io/badge/Try_it_Live-→-brightgreen?style=for-the-badge)](https://commits.site/app)
+[![Website](https://img.shields.io/badge/Website-commits.site-10b981?style=for-the-badge)](https://commits.site)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)](LICENSE)
 
 A slick, single-page dashboard that visualizes your GitHub contributions with heatmaps, charts, and trend analysis. No build step, no backend, just open and go.
@@ -9,14 +10,14 @@ A slick, single-page dashboard that visualizes your GitHub contributions with he
 
 ## Try It
 
-**Live demo:** [helgesverre.github.io/contribution-overview](https://helgesverre.github.io/contribution-overview/)
+**Live demo:** [commits.site/app](https://commits.site/app)
 
 Or run it locally:
 
 ```bash
 # Clone and open
-git clone https://github.com/HelgeSverre/contribution-overview.git
-cd contribution-overview
+git clone https://github.com/HelgeSverre/commits.site.git
+cd commits.site
 
 # Option 1: Just open it
 open index.html
@@ -24,6 +25,15 @@ open index.html
 # Option 2: Serve it (enables all features)
 npx serve .
 ```
+
+## Features
+
+- 📊 **Contribution Heatmap** - GitHub-style visualization across any date range
+- 📈 **Activity Trends** - Monthly charts showing your momentum over time
+- 🏆 **Repository Stats** - See which repos you contribute to most
+- 🎨 **14 Accent Colors** - Personalize your dashboard theme
+- 🔒 **Privacy First** - All data stays in your browser, no tracking
+- 📱 **PWA Support** - Install as an app on desktop or mobile
 
 ## Setup
 
