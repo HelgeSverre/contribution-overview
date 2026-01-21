@@ -266,7 +266,7 @@
                         </p>
                     </div>
 
-                    <div class="flex items-center gap-3 p-3 bg-zinc-800/50 rounded-xl border border-zinc-700/50">
+                    <div x-show="isLocal" class="flex items-center gap-3 p-3 bg-zinc-800/50 rounded-xl border border-zinc-700/50">
                         <input
                             type="checkbox"
                             id="useLocalFile"
@@ -595,6 +595,7 @@
                 username: '',
                 token: '',
                 useLocalFile: false,
+                isLocal: location.protocol === 'file:' || ['localhost', '127.0.0.1'].includes(location.hostname),
                 avatarUrl: '',
                 data: null,
                 loading: false,
