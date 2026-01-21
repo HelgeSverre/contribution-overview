@@ -1190,14 +1190,45 @@
 
                     const cellSize = 11;
                     const cellGap = 3;
+                    const yearGap = 20;
                     const weeks = this.data.weeks;
-                    const totalWeeks = weeks.length;
-
-                    const width = totalWeeks * (cellSize + cellGap) + 50;
-                    const height = 7 * (cellSize + cellGap) + 25;
-
-                    // Month labels
                     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+                    // First pass: calculate x positions with year gaps
+                    const weekPositions = [];
+                    let lastYear = -1;
+                    let x = 50;
+                    const yearBoundaries = []; // Track where year labels should go
+
+                    weeks.forEach((week, weekIndex) => {
+                        if (week.contributionDays.length > 0) {
+                            const date = new Date(week.contributionDays[0].date);
+                            const year = date.getFullYear();
+
+                            if (lastYear !== -1 && year !== lastYear) {
+                                // Add gap before new year
+                                x += yearGap;
+                            }
+
+                            if (year !== lastYear) {
+                                yearBoundaries.push({ x, year });
+                                lastYear = year;
+                            }
+                        }
+
+                        weekPositions.push(x);
+                        x += cellSize + cellGap;
+                    });
+
+                    const width = x + 10;
+                    const height = 7 * (cellSize + cellGap) + 40; // Extra height for year labels
+
+                    // Year labels (at top)
+                    let yearLabels = yearBoundaries.map(({ x, year }) =>
+                        `<text x="${x}" y="10" fill="#a1a1aa" style="font-size: 12px; font-weight: 500; font-family: system-ui, sans-serif">${year}</text>`
+                    ).join('');
+
+                    // Month labels (below year labels)
                     let monthLabels = '';
                     let lastMonth = -1;
 
@@ -1206,8 +1237,7 @@
                             const date = new Date(week.contributionDays[0].date);
                             const month = date.getMonth();
                             if (month !== lastMonth) {
-                                const x = 50 + weekIndex * (cellSize + cellGap);
-                                monthLabels += `<text x="${x}" y="10" fill="#71717a" style="font-size: 11px; font-family: system-ui, sans-serif">${months[month]}</text>`;
+                                monthLabels += `<text x="${weekPositions[weekIndex]}" y="24" fill="#71717a" style="font-size: 11px; font-family: system-ui, sans-serif">${months[month]}</text>`;
                                 lastMonth = month;
                             }
                         }
@@ -1216,15 +1246,15 @@
                     // Day labels
                     const dayLabels = ['', 'Mon', '', 'Wed', '', 'Fri', ''];
                     let dayLabelsSvg = dayLabels.map((label, i) =>
-                        `<text x="0" y="${20 + i * (cellSize + cellGap) + cellSize - 2}" fill="#71717a" style="font-size: 11px; font-family: system-ui, sans-serif">${label}</text>`
+                        `<text x="0" y="${34 + i * (cellSize + cellGap) + cellSize - 2}" fill="#71717a" style="font-size: 11px; font-family: system-ui, sans-serif">${label}</text>`
                     ).join('');
 
                     // Cells
                     let cells = '';
                     weeks.forEach((week, weekIndex) => {
                         week.contributionDays.forEach((day, dayIndex) => {
-                            const x = 50 + weekIndex * (cellSize + cellGap);
-                            const y = 16 + dayIndex * (cellSize + cellGap);
+                            const cellX = weekPositions[weekIndex];
+                            const cellY = 30 + dayIndex * (cellSize + cellGap);
                             const level = this.getColorLevel(day.contributionCount);
                             const color = this.getColorClass(level);
                             const dateStr = this.formatDate(day.date);
@@ -1232,8 +1262,8 @@
                             const tooltip = `${day.contributionCount} contribution${day.contributionCount !== 1 ? 's' : ''} on ${dayOfWeek}, ${dateStr}`;
 
                             cells += `<rect
-                                x="${x}"
-                                y="${y}"
+                                x="${cellX}"
+                                y="${cellY}"
                                 width="${cellSize}"
                                 height="${cellSize}"
                                 rx="2"
@@ -1248,6 +1278,7 @@
                     });
 
                     return `<svg width="${width}" height="${height}" style="overflow: visible">
+                        ${yearLabels}
                         ${monthLabels}
                         ${dayLabelsSvg}
                         ${cells}
