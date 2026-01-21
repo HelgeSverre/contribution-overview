@@ -1,7 +1,7 @@
 # GitHub Contributions Dashboard
 
 [![Try it Live](https://img.shields.io/badge/Try_it_Live-→-brightgreen?style=for-the-badge)](https://helgesverre.github.io/contribution-overview/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)](LICENSE)
 
 A slick, single-page dashboard that visualizes your GitHub contributions with heatmaps, charts, and trend analysis. No build step, no backend, just open and go.
 
