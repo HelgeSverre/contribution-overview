@@ -31,3 +31,9 @@ data.json
 # Dev utility scripts
 screenshot.mjs
 generate-mock-data.mjs
+
+# Vercel
+.vercel/
+
+# Website build artifacts
+website/.vercel/
