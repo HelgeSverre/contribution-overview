@@ -27,3 +27,7 @@ build/
 
 # Local data files (may contain private GitHub data)
 data.json
+
+# Dev utility scripts
+screenshot.mjs
+generate-mock-data.mjs

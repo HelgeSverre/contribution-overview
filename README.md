@@ -1,65 +1,62 @@
 # GitHub Contributions Dashboard
 
-A single-page dashboard that visualizes your GitHub contribution data with heatmaps, bar charts, and trend analysis.
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![GitHub Pages](https://img.shields.io/badge/demo-live-blue)](https://helgesverre.github.io/contribution-overview/)
 
-## Features
+A slick, single-page dashboard that visualizes your GitHub contributions with heatmaps, charts, and trend analysis. No build step, no backend, just open and go.
 
-- Contribution heatmap (GitHub-style calendar view)
-- Bar chart showing contributions per repository
-- Trend chart with moving averages
-- Date range presets (1 week to 3 years) and custom ranges
-- Works with public and private repository contributions
+![Screenshot](screenshot.png)
 
-## Getting Started
+## Try It
 
-Open `index.html` in your browser - no build step required.
+**Live demo:** [helgesverre.github.io/contribution-overview](https://helgesverre.github.io/contribution-overview/)
 
-For local development with a server:
+Or run it locally:
+
 ```bash
+# Clone and open
+git clone https://github.com/HelgeSverre/contribution-overview.git
+cd contribution-overview
+
+# Option 1: Just open it
+open index.html
+
+# Option 2: Serve it (enables all features)
 npx serve .
 ```
 
-## Data Loading
-
-The dashboard supports two modes for fetching contribution data:
-
-### Browser API Mode (Default)
-
-Fetches data directly from GitHub's GraphQL API in your browser.
+## Setup
 
 1. Open the dashboard and click the settings icon
 2. Enter your GitHub username
-3. Enter a [GitHub personal access token](https://github.com/settings/tokens) with `read:user` scope
-4. Select a date range and click "Fetch Data"
+3. Create a [GitHub personal access token](https://github.com/settings/tokens) with `read:user` scope
+4. Paste your token and hit "Fetch Data"
 
-Your token is stored in browser localStorage and never sent anywhere except GitHub's API.
+Your token stays in your browser's localStorage and is only sent to GitHub's API.
 
-### Local File Mode (CLI)
+## CLI Mode
 
-Pre-fetch data via command line and load from a local file. Useful for:
-- Avoiding token storage in the browser
-- Automation and CI workflows
-- Offline viewing
+Prefer not to store tokens in the browser? Fetch data via command line instead:
 
-**Setup:**
 ```bash
 # Authenticate with GitHub CLI (one-time)
 gh auth login
 
-# Fetch contribution data
+# Fetch your contributions
 ./fetch-data.sh <username> [from-date] [to-date]
 
-# Examples:
+# Examples
 ./fetch-data.sh octocat                        # Last year
 ./fetch-data.sh octocat 2024-01-01             # From date to now
 ./fetch-data.sh octocat 2024-01-01 2024-06-30  # Custom range
 ```
 
-This saves data to `data.json`. Then in the dashboard settings, enable "Use local data.json file".
+Then enable "Use local data.json file" in settings.
 
 ## Tech Stack
 
-- [Alpine.js](https://alpinejs.dev/) - Reactivity
-- [Tailwind CSS](https://tailwindcss.com/) - Styling
-- [Flatpickr](https://flatpickr.js.org/) - Date picker
-- [Lucide](https://lucide.dev/) - Icons
+[Alpine.js](https://alpinejs.dev/) | [Tailwind CSS](https://tailwindcss.com/) | [Flatpickr](https://flatpickr.js.org/) | [Lucide](https://lucide.dev/)
+
+## License
+
+[MIT](LICENSE)
