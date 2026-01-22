@@ -37,3 +37,5 @@ scripts/generate-mock-data.mjs
 
 # Website build artifacts
 website/.vercel/
+.vercel
+.env*.local
