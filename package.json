@@ -1,4 +1,7 @@
 {
+  "scripts": {
+    "format": "bunx prettier --write ."
+  },
   "dependencies": {},
   "devDependencies": {
     "@playwright/test": "^1.57.0",
