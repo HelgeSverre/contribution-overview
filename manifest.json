@@ -2,7 +2,7 @@
   "name": "GitHub Contributions Dashboard",
   "short_name": "Contributions",
   "description": "Visualize your GitHub contribution activity with beautiful charts and heatmaps",
-  "start_url": "/index.html",
+  "start_url": "/",
   "display": "standalone",
   "background_color": "#09090b",
   "theme_color": "#10b981",

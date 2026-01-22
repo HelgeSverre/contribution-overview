@@ -4,11 +4,12 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
+const rootDir = join(__dirname, "..");
 
-const screenshotPath = join(__dirname, "screenshot.png");
+const screenshotPath = join(rootDir, "screenshot.png");
 const screenshotBase64 = readFileSync(screenshotPath).toString("base64");
 
-const templatePath = join(__dirname, "og.html");
+const templatePath = join(rootDir, "og.html");
 const html = readFileSync(templatePath, "utf-8").replace(
   "{{SCREENSHOT_BASE64}}",
   `data:image/png;base64,${screenshotBase64}`,
@@ -24,7 +25,7 @@ async function generateOgImage(): Promise<void> {
   await page.waitForTimeout(1000);
 
   await page.screenshot({
-    path: join(__dirname, "og-image.png"),
+    path: join(rootDir, "og-image.png"),
     type: "png",
   });
 

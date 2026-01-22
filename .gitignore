@@ -30,7 +30,7 @@ data.json
 
 # Dev utility scripts
 screenshot.mjs
-generate-mock-data.mjs
+scripts/generate-mock-data.mjs
 
 # Vercel
 .vercel/

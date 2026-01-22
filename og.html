@@ -223,7 +223,12 @@
 
       <div class="right">
         <div class="screenshot-container">
-          <img class="screenshot" src="{{SCREENSHOT_BASE64}}" alt="Dashboard" />
+          <img
+            class="screenshot"
+            src="{{SCREENSHOT_BASE64}}"
+            alt="Dashboard"
+            onerror="this.src = 'screenshot.png'"
+          />
           <div class="screenshot-overlay"></div>
         </div>
       </div>

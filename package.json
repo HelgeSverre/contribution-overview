@@ -1,10 +1,28 @@
 {
+  "name": "commits-site",
+  "version": "1.0.0",
+  "description": "Landing page and dashboard for commits.site",
+  "private": true,
   "scripts": {
-    "format": "bunx prettier --write ."
+    "dev": "bunx serve . -p 3000",
+    "preview": "bunx serve . -p 3000",
+    "format": "bunx prettier --write .",
+    "deploy": "vercel --prod",
+    "deploy:preview": "vercel"
   },
-  "dependencies": {},
+  "keywords": [
+    "github",
+    "contributions",
+    "dashboard",
+    "heatmap"
+  ],
+  "author": "Helge Sverre",
+  "license": "MIT",
   "devDependencies": {
     "@playwright/test": "^1.57.0",
     "playwright": "^1.57.0"
+  },
+  "dependencies": {
+    "@types/bun": "^1.3.6"
   }
 }
