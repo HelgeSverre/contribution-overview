@@ -9,7 +9,12 @@
     "deploy": "vercel --prod",
     "deploy:preview": "vercel"
   },
-  "keywords": ["github", "contributions", "dashboard", "heatmap"],
+  "keywords": [
+    "github",
+    "contributions",
+    "dashboard",
+    "heatmap"
+  ],
   "author": "Helge Sverre",
   "license": "MIT"
 }
