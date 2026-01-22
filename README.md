@@ -63,10 +63,6 @@ gh auth login
 
 Then enable "Use local data.json file" in settings.
 
-## Tech Stack
-
-[Alpine.js](https://alpinejs.dev/) | [Tailwind CSS](https://tailwindcss.com/) | [Flatpickr](https://flatpickr.js.org/) | [Lucide](https://lucide.dev/)
-
 ## License
 
 [MIT](LICENSE)
