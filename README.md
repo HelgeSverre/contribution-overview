@@ -19,10 +19,11 @@ Or run it locally:
 git clone https://github.com/HelgeSverre/commits.site.git
 cd commits.site
 
-# Option 1: Just open it
-open index.html
+# Option 1: Just open the dashboard
+open app/index.html
 
 # Option 2: Serve it (enables all features)
+# Note: index.html is the landing page, app/index.html is the dashboard
 npx serve .
 ```
 

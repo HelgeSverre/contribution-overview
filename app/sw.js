@@ -1,10 +1,10 @@
-const CACHE_NAME = "contributions-v1";
+const CACHE_NAME = "contributions-v2";
 const ASSETS = [
   "/app/",
   "/app/index.html",
   "/app/manifest.json",
-  "/app/icons/icon-192.png",
-  "/app/icons/icon-512.png",
+  "/icons/icon-192.png",
+  "/icons/icon-512.png",
 ];
 
 self.addEventListener("install", (event) => {

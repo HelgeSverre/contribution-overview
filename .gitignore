@@ -1,6 +1,9 @@
+
 # Dependencies
 node_modules/
 bun.lock
+.vercel
+
 
 # OS files
 .DS_Store
@@ -25,17 +28,5 @@ npm-debug.log*
 dist/
 build/
 
-# Local data files (may contain private GitHub data)
+# Local data files
 data.json
-
-# Dev utility scripts
-screenshot.mjs
-scripts/generate-mock-data.mjs
-
-# Vercel
-.vercel/
-
-# Website build artifacts
-website/.vercel/
-.vercel
-.env*.local

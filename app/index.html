@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>GitHub Contributions Dashboard</title>
+    <title>Commits.site - Dashboard</title>
     <meta
       name="description"
       content="Visualize your GitHub contribution activity with beautiful charts, heatmaps, and analytics"
@@ -14,9 +14,9 @@
       rel="icon"
       type="image/png"
       sizes="192x192"
-      href="icons/icon-192.png"
+      href="/icons/icon-192.png"
     />
-    <link rel="apple-touch-icon" href="icons/icon-192.png" />
+    <link rel="apple-touch-icon" href="/icons/icon-192.png" />
     <script
       defer
       src="https://cdn.jsdelivr.net/npm/@alpinejs/collapse@3.x.x/dist/cdn.min.js"
@@ -297,7 +297,7 @@
       <header
         class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6"
       >
-        <div class="flex items-center gap-3">
+        <div class="flex items-center gap-6">
           <div class="p-2 bg-zinc-900 rounded-lg border border-zinc-800">
             <i data-lucide="git-branch" class="w-6 h-6 text-accent-500"></i>
           </div>
@@ -305,7 +305,14 @@
             GitHub Contributions
           </h1>
         </div>
-        <div class="flex items-center gap-3">
+        <div class="flex items-center justify-between gap-3">
+          <button
+            @click="showSettings = true"
+            class="inline-flex items-center gap-2 px-4 py-2 text-sm bg-zinc-900 hover:bg-zinc-800 rounded-lg border border-zinc-800 transition-colors"
+          >
+            <i data-lucide="settings" class="w-4 h-4"></i>
+            Settings
+          </button>
           <a
             x-show="username && avatarUrl"
             :href="'https://github.com/' + username"
@@ -317,16 +324,9 @@
             <img
               :src="avatarUrl"
               :alt="username"
-              class="w-8 h-8 rounded-full border border-zinc-700 hover:border-zinc-500 transition-colors"
+              class="size-8 rounded-full border border-zinc-700 hover:border-zinc-500 transition-colors"
             />
           </a>
-          <button
-            @click="showSettings = true"
-            class="inline-flex items-center gap-2 px-4 py-2 text-sm bg-zinc-900 hover:bg-zinc-800 rounded-lg border border-zinc-800 transition-colors"
-          >
-            <i data-lucide="settings" class="w-4 h-4"></i>
-            Settings
-          </button>
         </div>
       </header>
 
