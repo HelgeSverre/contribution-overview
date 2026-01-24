@@ -98,8 +98,7 @@ function generateMockData(): void {
   ];
 
   const totalContributions = weeks.reduce(
-    (sum, week) =>
-      sum + week.contributionDays.reduce((s, d) => s + d.contributionCount, 0),
+    (sum, week) => sum + week.contributionDays.reduce((s, d) => s + d.contributionCount, 0),
     0,
   );
 
@@ -127,9 +126,7 @@ function generateMockData(): void {
   };
 
   writeFileSync("data.json", JSON.stringify(data, null, 2));
-  console.log(
-    `Generated ${weeks.length} weeks of data with ${totalContributions} total contributions`,
-  );
+  console.log(`Generated ${weeks.length} weeks of data with ${totalContributions} total contributions`);
 }
 
 generateMockData();

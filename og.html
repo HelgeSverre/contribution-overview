@@ -14,12 +14,7 @@
         width: 1200px;
         height: 630px;
         font-family: "Space Grotesk", system-ui, sans-serif;
-        background: linear-gradient(
-          135deg,
-          #09090b 0%,
-          #18181b 50%,
-          #09090b 100%
-        );
+        background: linear-gradient(135deg, #09090b 0%, #18181b 50%, #09090b 100%);
         overflow: hidden;
         position: relative;
       }
@@ -37,11 +32,7 @@
         position: absolute;
         width: 600px;
         height: 600px;
-        background: radial-gradient(
-          circle,
-          rgba(16, 185, 129, 0.15) 0%,
-          transparent 70%
-        );
+        background: radial-gradient(circle, rgba(16, 185, 129, 0.15) 0%, transparent 70%);
         top: -200px;
         right: -100px;
       }
@@ -50,11 +41,7 @@
         position: absolute;
         width: 400px;
         height: 400px;
-        background: radial-gradient(
-          circle,
-          rgba(52, 211, 153, 0.1) 0%,
-          transparent 70%
-        );
+        background: radial-gradient(circle, rgba(52, 211, 153, 0.1) 0%, transparent 70%);
         bottom: -100px;
         left: -50px;
       }
@@ -112,12 +99,7 @@
       }
 
       .gradient-text {
-        background: linear-gradient(
-          135deg,
-          #10b981 0%,
-          #34d399 50%,
-          #6ee7b7 100%
-        );
+        background: linear-gradient(135deg, #10b981 0%, #34d399 50%, #6ee7b7 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
@@ -179,11 +161,7 @@
       .screenshot-overlay {
         position: absolute;
         inset: 0;
-        background: linear-gradient(
-          180deg,
-          transparent 60%,
-          rgba(9, 9, 11, 0.3) 100%
-        );
+        background: linear-gradient(180deg, transparent 60%, rgba(9, 9, 11, 0.3) 100%);
       }
     </style>
   </head>
@@ -195,7 +173,8 @@
     <div class="container">
       <div class="left">
         <h1>
-          Visualize Your<br />
+          Visualize Your
+          <br />
           <span class="gradient-text">GitHub Story</span>
         </h1>
 
@@ -223,12 +202,7 @@
 
       <div class="right">
         <div class="screenshot-container">
-          <img
-            class="screenshot"
-            src="{{SCREENSHOT_BASE64}}"
-            alt="Dashboard"
-            onerror="this.src = 'screenshot.png'"
-          />
+          <img class="screenshot" src="{{SCREENSHOT_BASE64}}" alt="Dashboard" onerror="this.src = 'screenshot.png'" />
           <div class="screenshot-overlay"></div>
         </div>
       </div>
