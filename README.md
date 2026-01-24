@@ -4,7 +4,8 @@
 [![Website](https://img.shields.io/badge/Website-commits.site-10b981?style=for-the-badge)](https://commits.site)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)](LICENSE)
 
-A slick, single-page dashboard that visualizes your GitHub contributions with heatmaps, charts, and trend analysis. No build step, no backend, just open and go.
+A slick, single-page dashboard that visualizes your GitHub contributions with heatmaps, charts, and trend analysis. No
+build step, no backend, just open and go.
 
 ![Screenshot](screenshot.png)
 
@@ -27,14 +28,19 @@ open app/index.html
 npx serve .
 ```
 
-## Features
+## Customizable title
 
-- 📊 **Contribution Heatmap** - GitHub-style visualization across any date range
-- 📈 **Activity Trends** - Monthly charts showing your momentum over time
-- 🏆 **Repository Stats** - See which repos you contribute to most
-- 🎨 **14 Accent Colors** - Personalize your dashboard theme
-- 🔒 **Privacy First** - All data stays in your browser, no tracking
-- 📱 **PWA Support** - Install as an app on desktop or mobile
+| [user.name]         | explain |
+| ------------------- | ------- |
+| [user.name]         | explain |
+| [user.avatar]       | explain |
+| [stats.total]       | explain |
+| [stats.repos]       | explain |
+| [stats.bestDay]     | explain |
+| [stats.bestDayDate] | explain |
+| [stats.dailyAvg]    | explain |
+| [date.from]         | explain |
+| [date.to]           | explain |
 
 ## Setup
 
