@@ -44,9 +44,16 @@ Two-page static site:
 
 Dashboard component (`app/index.html`):
 
-- Lines 883-1875: Alpine.js `dashboard()` component with all state and methods
+- Line 946: Alpine.js `dashboard()` function with all state and methods
 - Fetches from GitHub GraphQL API with automatic chunking for ranges >1 year
 - Supports date range presets (1w, 1m, 3m, 6m, 1y, 3y) and custom ranges
 - Settings stored in localStorage under `github-dashboard` key
 - SVG-based rendering for heatmap, bar chart, and trend chart
 - PWA support with service worker (`app/sw.js`)
+
+## Utility Scripts
+
+```bash
+bun scripts/generate-mock-data.ts   # Generate fake data.json for testing
+bun scripts/generate-opengraph.ts   # Generate og-image.png from screenshot.png
+```
