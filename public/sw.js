@@ -1,4 +1,4 @@
-const CACHE_NAME = "contributions-v3";
+const CACHE_NAME = "contributions-v4";
 
 self.addEventListener("install", () => {
   self.skipWaiting();
@@ -21,19 +21,28 @@ self.addEventListener("fetch", (event) => {
   if (url.origin !== location.origin) return;
   if (url.pathname === "/data.json") return;
 
-  event.respondWith(
-    caches.match(event.request).then((cached) => {
-      const fetched = fetch(event.request)
-        .then((response) => {
-          if (response.ok) {
-            const clone = response.clone();
-            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
-          }
-          return response;
-        })
-        .catch(() => cached);
+  const cacheUrl = new URL(event.request.url);
+  if (cacheUrl.pathname === "/app") cacheUrl.pathname = "/app/";
+  const cacheKey = cacheUrl.href;
+  const fetched = fetch(event.request).then(async (response) => {
+    if (response.ok) {
+      const cache = await caches.open(CACHE_NAME);
+      await cache.put(cacheKey, response.clone());
+    }
+    return response;
+  });
 
-      return cached || fetched;
-    }),
-  );
+  if (event.request.mode === "navigate") {
+    event.respondWith(
+      fetched.catch(async (error) => {
+        const cached = await caches.match(cacheKey);
+        if (cached) return cached;
+        throw error;
+      }),
+    );
+    return;
+  }
+
+  event.waitUntil(fetched.then(() => undefined).catch(() => undefined));
+  event.respondWith(caches.match(cacheKey).then((cached) => cached || fetched));
 });

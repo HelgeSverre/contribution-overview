@@ -56,6 +56,14 @@ test("launch dashboard opens the dashboard entry point", async ({ page }) => {
   await expect(page.getByRole("button", { name: "Open settings" })).toBeVisible();
 });
 
+test("both dashboard route variants resolve to canonical /app/", async ({ page }) => {
+  for (const route of ["/app", "/app/"]) {
+    await page.goto(route);
+    await expect(page).toHaveURL(/\/app\/$/);
+    await expect(page.getByRole("button", { name: "Open settings" })).toBeVisible();
+  }
+});
+
 test("charts show ten years without horizontal overflow", async ({ page }) => {
   await openDashboard(page);
 
