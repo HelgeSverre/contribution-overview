@@ -1,12 +1,6 @@
-const CACHE_NAME = "contributions-v2";
-const ASSETS = ["/app/", "/app/index.html", "/app/manifest.json", "/icons/icon-192.png", "/icons/icon-512.png"];
+const CACHE_NAME = "contributions-v3";
 
-self.addEventListener("install", (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(ASSETS);
-    }),
-  );
+self.addEventListener("install", () => {
   self.skipWaiting();
 });
 
@@ -20,13 +14,12 @@ self.addEventListener("activate", (event) => {
 });
 
 self.addEventListener("fetch", (event) => {
-  // Skip non-GET requests and external resources
   if (event.request.method !== "GET") return;
 
   const url = new URL(event.request.url);
 
-  // Don't cache GitHub API calls or external CDN resources
   if (url.origin !== location.origin) return;
+  if (url.pathname === "/data.json") return;
 
   event.respondWith(
     caches.match(event.request).then((cached) => {

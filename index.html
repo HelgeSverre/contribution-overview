@@ -40,131 +40,26 @@
     <meta name="twitter:image" content="/og-image.png" />
 
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-
     <link rel="apple-touch-icon" href="/icons/icon-192.png" />
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
+
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
-    <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            fontFamily: {
-              display: ["Space Grotesk", "system-ui", "sans-serif"],
-              mono: ["JetBrains Mono", "monospace"],
-            },
-          },
-        },
-      };
-    </script>
-    <style>
-      body {
-        font-family: "Space Grotesk", system-ui, sans-serif;
-      }
 
-      .gradient-text {
-        background: linear-gradient(135deg, #10b981 0%, #34d399 50%, #6ee7b7 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-      }
-
-      .glow {
-        box-shadow: 0 0 60px -15px rgba(16, 185, 129, 0.4);
-      }
-
-      .grid-bg {
-        background-image:
-          linear-gradient(rgba(16, 185, 129, 0.03) 1px, transparent 1px),
-          linear-gradient(90deg, rgba(16, 185, 129, 0.03) 1px, transparent 1px);
-        background-size: 60px 60px;
-      }
-
-      .heatmap-cell {
-        animation: pulse 2s ease-in-out infinite;
-      }
-      .heatmap-cell:nth-child(odd) {
-        animation-delay: 0.5s;
-      }
-      .heatmap-cell:nth-child(3n) {
-        animation-delay: 1s;
-      }
-      .heatmap-cell:nth-child(5n) {
-        animation-delay: 1.5s;
-      }
-
-      @keyframes pulse {
-        0%,
-        100% {
-          opacity: 0.6;
-        }
-        50% {
-          opacity: 1;
-        }
-      }
-
-      @keyframes float {
-        0%,
-        100% {
-          transform: translateY(0px);
-        }
-        50% {
-          transform: translateY(-10px);
-        }
-      }
-
-      .float {
-        animation: float 6s ease-in-out infinite;
-      }
-
-      .code-block {
-        background: linear-gradient(145deg, #18181b 0%, #0f0f11 100%);
-      }
-
-      .feature-card {
-        background: linear-gradient(145deg, rgba(39, 39, 42, 0.5) 0%, rgba(24, 24, 27, 0.8) 100%);
-        backdrop-filter: blur(10px);
-      }
-
-      .feature-card:hover {
-        background: linear-gradient(145deg, rgba(39, 39, 42, 0.7) 0%, rgba(24, 24, 27, 0.9) 100%);
-        transform: translateY(-2px);
-      }
-    </style>
+    <script type="module" src="/src/landing.ts"></script>
   </head>
-  <body class="overflow-x-hidden bg-zinc-950 text-zinc-100 antialiased">
+  <body class="font-display overflow-x-hidden bg-zinc-950 text-zinc-100 antialiased">
     <!-- Ambient background -->
     <div class="grid-bg pointer-events-none fixed inset-0"></div>
     <div
-      class="pointer-events-none fixed left-1/2 top-0 h-[600px] w-[800px] -translate-x-1/2 rounded-full bg-emerald-500/5 blur-3xl"
+      class="pointer-events-none fixed top-0 left-1/2 h-[600px] w-[800px] -translate-x-1/2 rounded-full bg-emerald-500/5 blur-3xl"
     ></div>
 
-    <!-- Navigation -->
-    <!--    <nav class="relative z-10 max-w-6xl mx-auto px-6 py-6 flex items-center justify-between">-->
-    <!--        <div class="flex items-center gap-3">-->
-    <!--            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center">-->
-    <!--                <i data-lucide="git-branch" class="w-5 h-5 text-white"></i>-->
-    <!--            </div>-->
-    <!--            <span class="font-semibold text-lg">commits.site</span>-->
-    <!--        </div>-->
-    <!--        <div class="flex items-center gap-4">-->
-    <!--            <a href="https://github.com/HelgeSverre/contribution-overview" target="_blank" class="flex items-center gap-2 px-4 py-2 text-sm text-zinc-400 hover:text-white transition-colors">-->
-    <!--                <i data-lucide="github" class="w-4 h-4"></i>-->
-    <!--                GitHub-->
-    <!--            </a>-->
-    <!--            <a href="https://commits.site/app" class="px-5 py-2.5 text-sm font-medium bg-emerald-600 hover:bg-emerald-500 rounded-xl transition-colors">-->
-    <!--                Open Dashboard-->
-    <!--            </a>-->
-    <!--        </div>-->
-    <!--    </nav>-->
-
     <!-- Hero Section -->
-    <section class="relative z-10 mx-auto max-w-6xl px-6 pb-32 pt-20">
+    <section class="relative z-10 mx-auto max-w-6xl px-6 pt-20 pb-32">
       <div class="mx-auto max-w-3xl text-center">
         <div
           class="mb-8 inline-flex items-center gap-2 rounded-full border border-zinc-700/50 bg-zinc-800/50 px-4 py-2 text-sm text-zinc-400"
@@ -186,7 +81,7 @@
 
         <div class="flex flex-col items-center justify-center gap-4 sm:flex-row">
           <a
-            href="/app"
+            href="/app/"
             class="group flex items-center gap-3 rounded-2xl bg-emerald-600 px-8 py-4 font-medium transition-all hover:scale-105 hover:bg-emerald-500"
           >
             <i data-lucide="play" class="h-5 w-5"></i>
@@ -209,7 +104,7 @@
           class="pointer-events-none absolute inset-0 z-10 bg-gradient-to-t from-zinc-950 via-transparent to-transparent"
         ></div>
         <div class="glow overflow-hidden rounded-3xl border border-zinc-800">
-          <img src="screenshot.png" alt="GitHub Contributions Dashboard" class="w-full" />
+          <img src="/screenshot.png" alt="GitHub Contributions Dashboard" class="w-full" />
         </div>
       </div>
     </section>
@@ -359,7 +254,7 @@
             </h3>
             <div class="grid gap-4 text-sm text-zinc-400 sm:grid-cols-2">
               <div class="flex items-start gap-3">
-                <i data-lucide="chrome" class="mt-0.5 h-5 w-5 text-zinc-500"></i>
+                <i data-lucide="globe" class="mt-0.5 h-5 w-5 text-zinc-500"></i>
                 <div>
                   <p class="font-medium text-zinc-200">Chrome / Edge</p>
                   <p>Click the install icon in the address bar, or Menu → "Install app"</p>
@@ -412,7 +307,7 @@
         <h2 class="mb-4 text-3xl font-bold sm:text-4xl">Ready to explore?</h2>
         <p class="mb-8 text-lg text-zinc-400">Start visualizing your GitHub journey today.</p>
         <a
-          href="/app"
+          href="/app/"
           class="inline-flex items-center gap-3 rounded-2xl bg-emerald-600 px-8 py-4 font-medium transition-all hover:scale-105 hover:bg-emerald-500"
         >
           <i data-lucide="play" class="h-5 w-5"></i>
@@ -433,7 +328,7 @@
             target="_blank"
             class="flex items-center gap-2 transition-colors hover:text-white"
           >
-            <i data-lucide="github" class="h-4 w-4"></i>
+            <i data-lucide="code-xml" class="h-4 w-4"></i>
             View on GitHub
           </a>
           <a href="https://github.com/HelgeSverre" target="_blank" class="transition-colors hover:text-white">
@@ -442,9 +337,5 @@
         </div>
       </div>
     </footer>
-
-    <script>
-      lucide.createIcons();
-    </script>
   </body>
 </html>

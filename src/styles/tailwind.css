@@ -1,0 +1,164 @@
+@import "tailwindcss";
+@config "../../tailwind.config.js";
+
+[x-cloak] {
+  display: none !important;
+}
+
+/* Default accent colors (emerald) - overridden by JS based on user preference */
+:root {
+  --accent-400: #34d399;
+  --accent-500: #10b981;
+  --accent-600: #059669;
+  --accent-700: #047857;
+  --accent-900: #064e3b;
+}
+
+/* Flatpickr customization */
+.flatpickr-calendar {
+  background: #18181b !important;
+  border: 1px solid #3f3f46 !important;
+  box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.5) !important;
+}
+
+.flatpickr-day {
+  color: #e4e4e7 !important;
+}
+
+.flatpickr-day:hover {
+  background: #3f3f46 !important;
+  border-color: #3f3f46 !important;
+}
+
+.flatpickr-day.selected {
+  background: var(--accent-500) !important;
+  border-color: var(--accent-500) !important;
+}
+
+.flatpickr-day.inRange {
+  background: var(--accent-900) !important;
+  border-color: var(--accent-900) !important;
+  box-shadow:
+    -5px 0 0 var(--accent-900),
+    5px 0 0 var(--accent-900) !important;
+}
+
+.flatpickr-months .flatpickr-month {
+  background: #18181b !important;
+  color: #e4e4e7 !important;
+}
+
+.flatpickr-current-month .flatpickr-monthDropdown-months {
+  background: #18181b !important;
+  color: #e4e4e7 !important;
+}
+
+.flatpickr-current-month input.cur-year {
+  color: #e4e4e7 !important;
+}
+
+.flatpickr-weekdays {
+  background: #18181b !important;
+}
+
+.flatpickr-weekday {
+  color: #71717a !important;
+  background: #18181b !important;
+}
+
+.flatpickr-day.flatpickr-disabled {
+  color: #3f3f46 !important;
+}
+
+.numInputWrapper span {
+  border-color: #3f3f46 !important;
+}
+
+.numInputWrapper span:hover {
+  background: #3f3f46 !important;
+}
+
+.flatpickr-prev-month,
+.flatpickr-next-month {
+  fill: #71717a !important;
+}
+
+.flatpickr-prev-month:hover,
+.flatpickr-next-month:hover {
+  fill: #e4e4e7 !important;
+}
+
+.flatpickr-prev-month:hover svg,
+.flatpickr-next-month:hover svg {
+  fill: #e4e4e7 !important;
+}
+
+/* Landing page specific styles */
+.gradient-text {
+  background: linear-gradient(135deg, #10b981 0%, #34d399 50%, #6ee7b7 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.glow {
+  box-shadow: 0 0 60px -15px rgba(16, 185, 129, 0.4);
+}
+
+.grid-bg {
+  background-image:
+    linear-gradient(rgba(16, 185, 129, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(16, 185, 129, 0.03) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+
+.heatmap-cell {
+  animation: pulse 2s ease-in-out infinite;
+}
+.heatmap-cell:nth-child(odd) {
+  animation-delay: 0.5s;
+}
+.heatmap-cell:nth-child(3n) {
+  animation-delay: 1s;
+}
+.heatmap-cell:nth-child(5n) {
+  animation-delay: 1.5s;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.code-block {
+  background: linear-gradient(145deg, #18181b 0%, #0f0f11 100%);
+}
+
+.feature-card {
+  background: linear-gradient(145deg, rgba(39, 39, 42, 0.5) 0%, rgba(24, 24, 27, 0.8) 100%);
+  backdrop-filter: blur(10px);
+}
+
+.feature-card:hover {
+  background: linear-gradient(145deg, rgba(39, 39, 42, 0.7) 0%, rgba(24, 24, 27, 0.9) 100%);
+  transform: translateY(-2px);
+}

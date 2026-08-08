@@ -8,7 +8,8 @@ A GitHub contributions dashboard (commits.site) that visualizes contribution dat
 
 ## Tech Stack
 
-- **Frontend**: Alpine.js for reactivity, Tailwind CSS (CDN), Lucide icons, Flatpickr for date picking
+- **Frontend**: Alpine.js for reactivity, Tailwind CSS, Lucide icons, Flatpickr for date picking
+- **Build**: Vite for bundling
 - **Data**: GitHub GraphQL API (direct browser calls) or local `data.json` via CLI
 - **Hosting**: Vercel (static)
 - **Dev Dependencies**: Playwright for testing
@@ -16,9 +17,11 @@ A GitHub contributions dashboard (commits.site) that visualizes contribution dat
 ## Development
 
 ```bash
-bun run dev          # Start dev server on port 3000
+bun run dev          # Start Vite dev server
+bun run build        # Build for production
+bun run preview      # Preview production build
 bun run format       # Format with Prettier
-bun run deploy       # Deploy to Vercel production
+bun run deploy       # Build and deploy to Vercel production
 ```
 
 Fetch data via CLI (alternative to browser API mode):
@@ -37,19 +40,23 @@ Fetch data via CLI (alternative to browser API mode):
 
 ## Architecture
 
-Two-page static site:
+Multi-page static site with Vite:
 
 - `index.html` - Marketing landing page (Tailwind + Lucide, no Alpine)
 - `app/index.html` - Dashboard application (Alpine.js + all visualization logic)
+- `src/landing.ts` - Entry point for landing page
+- `src/app/main.ts` - Entry point for dashboard (Alpine init, flatpickr, icons)
+- `src/app/dashboard.ts` - Alpine.js dashboard component (~900 lines)
+- `src/icons.ts` - Tree-shaken Lucide icon imports
+- `src/styles/tailwind.css` - Tailwind directives + custom styles
 
-Dashboard component (`app/index.html`):
+Dashboard features:
 
-- Line 946: Alpine.js `dashboard()` function with all state and methods
 - Fetches from GitHub GraphQL API with automatic chunking for ranges >1 year
 - Supports date range presets (1w, 1m, 3m, 6m, 1y, 3y) and custom ranges
 - Settings stored in localStorage under `github-dashboard` key
 - SVG-based rendering for heatmap, bar chart, and trend chart
-- PWA support with service worker (`app/sw.js`)
+- PWA support with service worker (`public/sw.js`)
 
 ## Utility Scripts
 
