@@ -7,7 +7,7 @@
 A slick, single-page dashboard that visualizes your GitHub contributions with heatmaps, charts, and trend analysis. No
 build step, no backend, just open and go.
 
-![Screenshot](screenshot.png)
+![Screenshot](public/screenshot.png)
 
 ## Try It
 
