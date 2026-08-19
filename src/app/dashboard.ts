@@ -1011,6 +1011,20 @@ export function dashboard() {
       return ["#18181b", "#27272a", "#3f3f46", "#52525b", "#71717a"][level];
     },
 
+    heatmapHover(event: MouseEvent) {
+      const cell = (event.target as Element)?.closest?.("rect[data-date]");
+      if (!cell) return;
+      window.showChartTooltip(
+        event,
+        Number(cell.getAttribute("data-contribution-count")),
+        this.formatDate(cell.getAttribute("data-date") ?? ""),
+      );
+    },
+
+    heatmapLeave(event: MouseEvent) {
+      window.hideChartTooltip(event);
+    },
+
     renderHeatmap() {
       if (!this.data) return "";
 
@@ -1053,13 +1067,13 @@ export function dashboard() {
               seenMonths.add(month);
             }
             const tooltip = escapeXml(
-              `${day.contributionCount} contribution${day.contributionCount === 1 ? "" : "s"} on ${this.formatDate(day.date)}${day.outsideSelectedRange ? " (outside selected period)" : ""}`,
+              `${day.contributionCount} contribution${day.contributionCount === 1 ? "" : "s"} on ${this.formatDate(day.date)}`,
             );
             const fill = day.outsideSelectedRange
               ? this.getGrayscaleColor(this.getColorLevel(day.contributionCount))
               : this.getColorClass(this.getColorLevel(day.contributionCount));
             const outline = day.outsideSelectedRange ? ' stroke="#27272a" stroke-width="1"' : "";
-            cells += `<rect data-date="${day.date}" data-contribution-count="${day.contributionCount}" data-outside-range="${day.outsideSelectedRange}" x="${x}" y="${y}" width="${cellSize}" height="${cellSize}" rx="2" fill="${fill}"${outline}><title>${tooltip}</title></rect>`;
+            cells += `<rect data-date="${day.date}" data-contribution-count="${day.contributionCount}" data-outside-range="${day.outsideSelectedRange}" x="${x}" y="${y}" width="${cellSize}" height="${cellSize}" rx="2" fill="${fill}"${outline} aria-label="${tooltip}"></rect>`;
           });
 
           return `<svg data-year="${year}" width="100%" viewBox="0 0 ${width} ${height}" preserveAspectRatio="xMinYMin meet" role="img" aria-label="Contribution activity for ${year}">
