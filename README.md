@@ -1,8 +1,8 @@
 # GitHub Contributions Dashboard
 
-[![Try it Live](https://img.shields.io/badge/Try_it_Live-→-brightgreen?style=for-the-badge)](https://commits.site/app)
-[![Website](https://img.shields.io/badge/Website-commits.site-10b981?style=for-the-badge)](https://commits.site)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)](LICENSE)
+[![Try it Live](https://img.shields.io/badge/Try_it_Live-→-brightgreen)](https://commits.site/app)
+[![Website](https://img.shields.io/badge/Website-commits.site-10b981)](https://commits.site)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue)](LICENSE)
 
 A slick, single-page dashboard that visualizes your GitHub contributions with heatmaps, charts, and trend analysis. No
 build step, no backend, just open and go.
