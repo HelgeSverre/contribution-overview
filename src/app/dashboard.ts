@@ -209,6 +209,16 @@ function debounce<T extends (...args: unknown[]) => unknown>(fn: T, delay = 300)
   };
 }
 
+// Reused across thousands of heatmap cells; building the formatter per call is ~35x slower.
+const dateFormatter = new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", year: "numeric" });
+const dateTimeFormatter = new Intl.DateTimeFormat("en-US", {
+  month: "short",
+  day: "numeric",
+  year: "numeric",
+  hour: "2-digit",
+  minute: "2-digit",
+});
+
 function escapeXml(value: string) {
   return value.replace(/[&<>'"]/g, (character) => {
     const entities: Record<string, string> = { "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&apos;", '"': "&quot;" };
@@ -248,6 +258,13 @@ interface DashboardData {
   monthlyTotals: Record<string, number>;
   activityDays: ContributionDay[];
   fetchedAt: string;
+}
+
+interface ActivityGroup {
+  key: string;
+  label: string;
+  items: (ContributionDay | { key: string; label: string; count: number; days: number })[];
+  total: number;
 }
 
 interface DataRequest {
@@ -298,6 +315,7 @@ export function dashboard() {
     dataSourceKey: "",
     showSettings: false,
     activityGroupMode: "daily" as "daily" | "weekly" | "monthly",
+    activityGroupsCache: null as { data: DashboardData | null; mode: string; groups: ActivityGroup[] } | null,
     expandedGroups: {} as Record<string, boolean>,
     settingsForm: {
       username: "",
@@ -587,12 +605,21 @@ export function dashboard() {
 
       const { from, to } = request.range;
       const chunks = getDateChunks(from, to);
-      const results: GitHubResponse[] = [];
+      // Calendar-year padding for the heatmap; fetched alongside the in-range chunks.
+      const extensionChunks = getCalendarYearExtensions(from, to).flatMap((extension) =>
+        getDateChunks(extension.from, extension.to),
+      );
+      const allChunks = [...chunks, ...extensionChunks];
 
-      for (let index = 0; index < chunks.length; index += 3) {
-        results.push(
+      // Repositories paginate independently, so start them before the chunk batches.
+      const repositoriesPromise = this.fetchRepositories(request.username, request.token, from);
+      repositoriesPromise.catch(() => {});
+
+      const responses: GitHubResponse[] = [];
+      for (let index = 0; index < allChunks.length; index += 3) {
+        responses.push(
           ...(await Promise.all(
-            chunks
+            allChunks
               .slice(index, index + 3)
               .map((chunk) => this.fetchChunk(chunk.from, chunk.to, request.username, request.token)),
           )),
@@ -600,16 +627,10 @@ export function dashboard() {
         if (request.id !== this.requestId) return;
       }
 
+      const results = responses.slice(0, chunks.length);
+      const extensionResults = responses.slice(chunks.length);
       const merged = mergeContributionResponses(results);
-      const extensionChunks = getCalendarYearExtensions(from, to).flatMap((extension) =>
-        getDateChunks(extension.from, extension.to),
-      );
-      const [extensionResults, repositories] = await Promise.all([
-        Promise.all(
-          extensionChunks.map((chunk) => this.fetchChunk(chunk.from, chunk.to, request.username, request.token)),
-        ),
-        this.fetchRepositories(request.username, request.token),
-      ]);
+      const repositories = await repositoriesPromise;
       if (request.id !== this.requestId) return;
 
       merged.data.user.repositories = {
@@ -682,7 +703,7 @@ export function dashboard() {
       return json;
     },
 
-    async fetchRepositories(username: string, token: string) {
+    async fetchRepositories(username: string, token: string, createdAfter: Date) {
       const repositories: RepositoryNode[] = [];
       let cursor: string | null = null;
       let hasNextPage = true;
@@ -733,8 +754,13 @@ export function dashboard() {
         if (json.errors) throw new Error(json.errors[0].message);
         if (!json.data?.user) throw new Error(`User "${username}" not found`);
 
-        repositories.push(...json.data.user.repositories.nodes);
+        const nodes = json.data.user.repositories.nodes;
+        repositories.push(...nodes);
         ({ hasNextPage, endCursor: cursor } = json.data.user.repositories.pageInfo);
+
+        // Pages are CREATED_AT DESC and only in-range creations are used, so stop once we pass the start.
+        const oldest = nodes[nodes.length - 1];
+        if (oldest && new Date(oldest.createdAt).getTime() < createdAfter.getTime()) break;
       }
 
       return repositories;
@@ -817,23 +843,12 @@ export function dashboard() {
     },
 
     formatDate(dateStr: string) {
-      const date = new Date(dateStr + "T00:00:00");
-      return date.toLocaleDateString("en-US", {
-        month: "short",
-        day: "numeric",
-        year: "numeric",
-      });
+      return dateFormatter.format(new Date(dateStr + "T00:00:00"));
     },
 
     formatDateTime(dateStr: string) {
       const date = new Date(dateStr);
-      return date.toLocaleDateString("en-US", {
-        month: "short",
-        day: "numeric",
-        year: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-      });
+      return Number.isNaN(date.getTime()) ? "Invalid Date" : dateTimeFormatter.format(date);
     },
 
     getDayOfWeek(dateStr: string) {
@@ -892,15 +907,25 @@ export function dashboard() {
       return Object.values(groups).sort((a, b) => b.key.localeCompare(a.key));
     },
 
-    getActivityGroups() {
+    // Called from an x-for expression, so it must be cheap and return stable identities.
+    getActivityGroups(): ActivityGroup[] {
+      const cache = this.activityGroupsCache;
+      if (cache && cache.data === this.data && cache.mode === this.activityGroupMode) return cache.groups;
+
+      let groups: ActivityGroup[];
       switch (this.activityGroupMode) {
         case "weekly":
-          return this.groupDaysByWeek();
+          groups = this.groupDaysByWeek();
+          break;
         case "monthly":
-          return this.groupMonthsByYear();
+          groups = this.groupMonthsByYear();
+          break;
         default:
-          return this.groupDaysByMonth();
+          groups = this.groupDaysByMonth();
       }
+
+      this.activityGroupsCache = { data: this.data, mode: this.activityGroupMode, groups };
+      return groups;
     },
 
     groupDaysByWeek() {
@@ -1067,7 +1092,7 @@ export function dashboard() {
               seenMonths.add(month);
             }
             const tooltip = escapeXml(
-              `${day.contributionCount} contribution${day.contributionCount === 1 ? "" : "s"} on ${this.formatDate(day.date)}`,
+              `${day.contributionCount} contribution${day.contributionCount === 1 ? "" : "s"} on ${this.formatDate(day.date)}${day.outsideSelectedRange ? " (outside selected period)" : ""}`,
             );
             const fill = day.outsideSelectedRange
               ? this.getGrayscaleColor(this.getColorLevel(day.contributionCount))

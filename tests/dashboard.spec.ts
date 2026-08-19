@@ -173,6 +173,10 @@ test("cached data renders immediately and is replaced after a background refresh
   releaseRefresh?.();
   await expect.poll(async () => Number((await total.textContent())?.replaceAll(",", ""))).toBe(cachedTotal + 100);
   await expect(page.locator('[data-testid="background-refresh"]')).toBeHidden();
+  // Grouped activity is memoized, so it has to invalidate when the data is replaced.
+  await expect(page.locator('[data-testid="activity-list"]')).toContainText(
+    `${refreshedDay.contributionCount} contributions`,
+  );
 
   await page.reload();
   await expect.poll(() => requests).toBe(3);
@@ -403,6 +407,123 @@ test("live mode chunks contributions and paginates repositories", async ({ page 
       .first(),
   ).toHaveCount(1);
   expect(repositoryCursors).toEqual([null, "next-page"]);
+});
+
+test("live mode stops paginating repositories once they predate the range", async ({ page }) => {
+  await page.clock.setFixedTime(new Date("2026-08-07T12:00:00Z"));
+  await page.addInitScript(() => {
+    localStorage.setItem(
+      "github-dashboard",
+      JSON.stringify({ username: "fixture-user", token: "fixture-token", useLocalFile: false, selectedPreset: "1y" }),
+    );
+  });
+  const repositoryCursors: (string | null)[] = [];
+  await page.route("https://api.github.com/graphql", async (route) => {
+    const body = route.request().postDataJSON() as {
+      query: string;
+      variables: { from?: string; to?: string; cursor?: string | null };
+    };
+    if (body.query.includes("contributionsCollection")) {
+      await route.fulfill({ json: contributionResponse(body.variables.from!.slice(0, 10), 1) });
+      return;
+    }
+
+    repositoryCursors.push(body.variables.cursor ?? null);
+    await route.fulfill({
+      json: {
+        data: {
+          user: {
+            repositories: {
+              // Oldest node predates the selected range, so later pages cannot contribute anything.
+              nodes: [
+                {
+                  name: "old",
+                  nameWithOwner: "fixture/old",
+                  createdAt: "2019-01-01T00:00:00Z",
+                  isFork: false,
+                  isPrivate: false,
+                },
+              ],
+              pageInfo: { hasNextPage: true, endCursor: "next-page" },
+            },
+          },
+        },
+      },
+    });
+  });
+
+  await page.goto("/app/");
+  await expect(page.locator("[data-testid=heatmap] svg").first()).toBeVisible();
+  expect(repositoryCursors).toEqual([null]);
+});
+
+test("live mode fetches repositories alongside the contribution chunks", async ({ page }) => {
+  await page.clock.setFixedTime(new Date("2026-08-07T12:00:00Z"));
+  await page.addInitScript(() => {
+    localStorage.setItem(
+      "github-dashboard",
+      JSON.stringify({ username: "fixture-user", token: "fixture-token", useLocalFile: false, selectedPreset: "5y" }),
+    );
+  });
+
+  const arrivals: string[] = [];
+  await page.route("https://api.github.com/graphql", async (route) => {
+    const body = route.request().postDataJSON() as { query: string; variables: { from?: string } };
+    const isChunk = body.query.includes("contributionsCollection");
+    arrivals.push(isChunk ? "chunk" : "repos");
+
+    if (isChunk) {
+      // Slow chunks: a sequential repository phase would land after every chunk.
+      await new Promise((resolve) => setTimeout(resolve, 100));
+      await route.fulfill({ json: contributionResponse(body.variables.from!.slice(0, 10), 1) });
+      return;
+    }
+
+    await route.fulfill({
+      json: {
+        data: {
+          user: {
+            repositories: {
+              nodes: [
+                {
+                  name: "original",
+                  nameWithOwner: "fixture/original",
+                  createdAt: "2026-01-01T00:00:00Z",
+                  isFork: false,
+                  isPrivate: false,
+                },
+              ],
+              pageInfo: { hasNextPage: false, endCursor: null },
+            },
+          },
+        },
+      },
+    });
+  });
+
+  await page.goto("/app/");
+  await expect(page.locator("[data-testid=heatmap] svg").first()).toBeVisible();
+
+  expect(arrivals.filter((kind) => kind === "chunk").length).toBeGreaterThan(3);
+  expect(arrivals.indexOf("repos")).toBeLessThan(arrivals.lastIndexOf("chunk"));
+});
+
+test("switching presets back reuses the cached range", async ({ page }) => {
+  await openDashboard(page, { selectedPreset: "1y" });
+
+  await page.getByRole("button", { name: "3 Months", exact: true }).click();
+  await expect(page.locator("[data-testid=heatmap] svg").first()).toBeVisible();
+
+  const cacheKeys = await page.evaluate(() => {
+    const raw = localStorage.getItem("github-dashboard-data-cache-v1");
+    return (JSON.parse(raw ?? "{}").entries ?? []).map((entry: { cacheKey: string }) => entry.cacheKey);
+  });
+  expect(cacheKeys).toHaveLength(2);
+
+  await page.getByRole("button", { name: "1 Year", exact: true }).click();
+  // Warm start: the previous range renders immediately, no blank loading state.
+  await expect(page.getByText("Loading contribution data...")).toBeHidden();
+  await expect(page.locator("[data-testid=heatmap] svg").first()).toBeVisible();
 });
 
 test("a stale live request cannot overwrite a newer range", async ({ page }) => {

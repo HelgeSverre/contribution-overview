@@ -1,6 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import {
   DASHBOARD_CACHE_MAX_AGE_MS,
+  DASHBOARD_CACHE_MAX_ENTRIES,
   DASHBOARD_CACHE_STORAGE_KEY,
   getDashboardCacheKey,
   getDashboardSourceKey,
@@ -35,7 +36,7 @@ const identity = {
 describe("dashboard cache identity", () => {
   test("normalizes GitHub usernames without including credentials", () => {
     expect(getDashboardSourceKey(identity)).toBe("github:sample-developer");
-    expect(getDashboardCacheKey(identity)).toBe("1|github:sample-developer|3m|");
+    expect(getDashboardCacheKey(identity)).toBe("2|github:sample-developer|3m|");
   });
 
   test("keys custom ranges by calendar date", () => {
@@ -94,6 +95,39 @@ describe("dashboard cache storage", () => {
     saveDashboardCache(storage, key, "github:sample-developer", { total: 42 }, "", 1_000);
 
     expect(loadDashboardCache(storage, key, isData, 1_000 + DASHBOARD_CACHE_MAX_AGE_MS + 1)).toBeNull();
+    expect(storage.getItem(DASHBOARD_CACHE_STORAGE_KEY)).toBeNull();
+  });
+
+  test("keeps several ranges retrievable at once", () => {
+    const storage = new MemoryStorage();
+    saveDashboardCache(storage, "key-a", "github:sample-developer", { total: 1 }, "", 1_000);
+    saveDashboardCache(storage, "key-b", "github:sample-developer", { total: 2 }, "", 1_000);
+
+    expect(loadDashboardCache(storage, "key-a", isData, 2_000)?.data).toEqual({ total: 1 });
+    expect(loadDashboardCache(storage, "key-b", isData, 2_000)?.data).toEqual({ total: 2 });
+  });
+
+  test("evicts the oldest entry beyond the cap", () => {
+    const storage = new MemoryStorage();
+    for (let index = 0; index < DASHBOARD_CACHE_MAX_ENTRIES + 1; index++) {
+      saveDashboardCache(storage, `key-${index}`, "github:sample-developer", { total: index }, "", 1_000);
+    }
+
+    expect(loadDashboardCache(storage, "key-0", isData, 2_000)).toBeNull();
+    expect(loadDashboardCache(storage, "key-1", isData, 2_000)?.data).toEqual({ total: 1 });
+    expect(loadDashboardCache(storage, `key-${DASHBOARD_CACHE_MAX_ENTRIES}`, isData, 2_000)?.data).toEqual({
+      total: DASHBOARD_CACHE_MAX_ENTRIES,
+    });
+  });
+
+  test("discards payloads written by an older cache version", () => {
+    const storage = new MemoryStorage();
+    storage.setItem(
+      DASHBOARD_CACHE_STORAGE_KEY,
+      JSON.stringify({ version: 1, cacheKey: "key-a", sourceKey: "s", savedAt: 1_000, avatarUrl: "", data: {} }),
+    );
+
+    expect(loadDashboardCache(storage, "key-a", isData, 2_000)).toBeNull();
     expect(storage.getItem(DASHBOARD_CACHE_STORAGE_KEY)).toBeNull();
   });
 

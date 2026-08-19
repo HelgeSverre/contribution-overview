@@ -1,7 +1,8 @@
 export const DASHBOARD_CACHE_STORAGE_KEY = "github-dashboard-data-cache-v1";
 export const DASHBOARD_CACHE_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
+export const DASHBOARD_CACHE_MAX_ENTRIES = 5;
 
-const DASHBOARD_CACHE_VERSION = 1;
+const DASHBOARD_CACHE_VERSION = 2;
 
 export interface DashboardCacheIdentity {
   username: string;
@@ -17,13 +18,17 @@ interface StorageLike {
   removeItem(key: string): void;
 }
 
-interface StoredDashboardCache<T> {
-  version: number;
+interface StoredDashboardEntry<T> {
   cacheKey: string;
   sourceKey: string;
   savedAt: number;
   avatarUrl: string;
   data: T;
+}
+
+interface StoredDashboardCache<T> {
+  version: number;
+  entries: StoredDashboardEntry<T>[];
 }
 
 export interface DashboardCacheValue<T> {
@@ -61,6 +66,42 @@ function removeInvalidCache(storage: StorageLike) {
   }
 }
 
+function isValidEntry(value: unknown): value is StoredDashboardEntry<unknown> {
+  const entry = value as Partial<StoredDashboardEntry<unknown>> | null;
+  return Boolean(
+    entry &&
+    typeof entry === "object" &&
+    typeof entry.cacheKey === "string" &&
+    typeof entry.sourceKey === "string" &&
+    typeof entry.savedAt === "number" &&
+    typeof entry.avatarUrl === "string",
+  );
+}
+
+function readEntries(storage: StorageLike, now: number): StoredDashboardEntry<unknown>[] | null {
+  const raw = storage.getItem(DASHBOARD_CACHE_STORAGE_KEY);
+  if (!raw) return null;
+
+  const cached = JSON.parse(raw) as Partial<StoredDashboardCache<unknown>>;
+  if (cached.version !== DASHBOARD_CACHE_VERSION || !Array.isArray(cached.entries)) {
+    removeInvalidCache(storage);
+    return null;
+  }
+
+  const entries = cached.entries.filter(isValidEntry);
+  const fresh = entries.filter((entry) => now - entry.savedAt <= DASHBOARD_CACHE_MAX_AGE_MS);
+  if (fresh.length !== cached.entries.length) {
+    if (fresh.length === 0) removeInvalidCache(storage);
+    else writeEntries(storage, fresh);
+  }
+  return fresh;
+}
+
+function writeEntries(storage: StorageLike, entries: StoredDashboardEntry<unknown>[]) {
+  const cached: StoredDashboardCache<unknown> = { version: DASHBOARD_CACHE_VERSION, entries };
+  storage.setItem(DASHBOARD_CACHE_STORAGE_KEY, JSON.stringify(cached));
+}
+
 export function loadDashboardCache<T>(
   storage: StorageLike,
   cacheKey: string,
@@ -68,33 +109,23 @@ export function loadDashboardCache<T>(
   now = Date.now(),
 ): DashboardCacheValue<T> | null {
   try {
-    const raw = storage.getItem(DASHBOARD_CACHE_STORAGE_KEY);
-    if (!raw) return null;
+    const entries = readEntries(storage, now);
+    const entry = entries?.find((candidate) => candidate.cacheKey === cacheKey);
+    if (!entry) return null;
 
-    const cached = JSON.parse(raw) as Partial<StoredDashboardCache<unknown>>;
-    if (
-      cached.version !== DASHBOARD_CACHE_VERSION ||
-      typeof cached.cacheKey !== "string" ||
-      typeof cached.sourceKey !== "string" ||
-      typeof cached.savedAt !== "number" ||
-      typeof cached.avatarUrl !== "string" ||
-      !isValidData(cached.data)
-    ) {
-      removeInvalidCache(storage);
+    if (!isValidData(entry.data)) {
+      writeEntries(
+        storage,
+        entries!.filter((candidate) => candidate !== entry),
+      );
       return null;
     }
-
-    if (now - cached.savedAt > DASHBOARD_CACHE_MAX_AGE_MS) {
-      removeInvalidCache(storage);
-      return null;
-    }
-    if (cached.cacheKey !== cacheKey) return null;
 
     return {
-      sourceKey: cached.sourceKey,
-      savedAt: cached.savedAt,
-      avatarUrl: cached.avatarUrl,
-      data: cached.data,
+      sourceKey: entry.sourceKey,
+      savedAt: entry.savedAt,
+      avatarUrl: entry.avatarUrl,
+      data: entry.data,
     };
   } catch {
     removeInvalidCache(storage);
@@ -110,18 +141,30 @@ export function saveDashboardCache<T>(
   avatarUrl: string,
   savedAt = Date.now(),
 ) {
+  const entry: StoredDashboardEntry<T> = { cacheKey, sourceKey, savedAt, avatarUrl, data };
+
+  let existing: StoredDashboardEntry<unknown>[] = [];
   try {
-    const cached: StoredDashboardCache<T> = {
-      version: DASHBOARD_CACHE_VERSION,
-      cacheKey,
-      sourceKey,
-      savedAt,
-      avatarUrl,
-      data,
-    };
-    storage.setItem(DASHBOARD_CACHE_STORAGE_KEY, JSON.stringify(cached));
+    existing = readEntries(storage, savedAt) ?? [];
+  } catch {
+    removeInvalidCache(storage);
+  }
+
+  const entries = [entry as StoredDashboardEntry<unknown>, ...existing.filter((it) => it.cacheKey !== cacheKey)].slice(
+    0,
+    DASHBOARD_CACHE_MAX_ENTRIES,
+  );
+
+  try {
+    writeEntries(storage, entries);
     return true;
   } catch {
-    return false;
+    // Most likely a quota error: keep only the newest entry and try once more.
+    try {
+      writeEntries(storage, [entry as StoredDashboardEntry<unknown>]);
+      return true;
+    } catch {
+      return false;
+    }
   }
 }
