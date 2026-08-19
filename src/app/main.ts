@@ -65,8 +65,10 @@ window.showChartTooltip = function (event: MouseEvent, count: number, label: str
   tooltip.style.top = top + "px";
   tooltip.classList.add("visible");
 
-  target.setAttribute("r", "7");
-  target.setAttribute("stroke-width", "3");
+  if (target.tagName === "circle") {
+    target.setAttribute("r", "7");
+    target.setAttribute("stroke-width", "3");
+  }
 };
 
 window.hideChartTooltip = function (event: MouseEvent) {
@@ -74,8 +76,10 @@ window.hideChartTooltip = function (event: MouseEvent) {
   if (tooltip) tooltip.classList.remove("visible");
 
   const target = event.target as SVGElement;
-  target.setAttribute("r", "5");
-  target.setAttribute("stroke-width", "2");
+  if (target.tagName === "circle") {
+    target.setAttribute("r", "5");
+    target.setAttribute("stroke-width", "2");
+  }
 };
 
 // Initialize Alpine

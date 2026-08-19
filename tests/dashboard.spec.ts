@@ -77,6 +77,24 @@ test("charts show ten years without horizontal overflow", async ({ page }) => {
   await expect(page.locator('[data-testid="repository-creations-chart"] [data-series="fork"]')).toBeVisible();
 });
 
+test("hovering a heatmap day shows a tooltip with count and date", async ({ page }) => {
+  await openDashboard(page);
+
+  const tooltip = page.locator("#chartTooltip");
+  await expect(tooltip).not.toHaveClass(/visible/);
+
+  const cell = page.locator('rect[data-date="2026-08-06"]').first();
+  await cell.hover();
+  await expect(tooltip).toHaveClass(/visible/);
+  await expect(tooltip.locator(".chart-tooltip-count")).toHaveText(
+    (await cell.getAttribute("data-contribution-count")) ?? "",
+  );
+  await expect(tooltip.locator(".chart-tooltip-label")).toContainText("2026");
+
+  await page.getByText("Total Contributions").hover();
+  await expect(tooltip).not.toHaveClass(/visible/);
+});
+
 test("heatmap remains contained on mobile", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await openDashboard(page);
@@ -95,8 +113,8 @@ test("short presets still render a complete calendar-year heatmap", async ({ pag
   const outsideContribution = year.locator('rect[data-date="2026-01-01"][data-outside-range="true"]');
   await expect(outsideContribution).toHaveAttribute("data-contribution-count", "5");
   expect(await outsideContribution.getAttribute("fill")).toMatch(/^#(?:27272a|3f3f46|52525b|71717a)$/);
-  await expect(outsideContribution.locator("title")).toContainText("5 contributions");
-  await expect(outsideContribution.locator("title")).toContainText("outside selected period");
+  await expect(outsideContribution).toHaveAttribute("aria-label", /5 contributions/);
+  await expect(outsideContribution).toHaveAttribute("aria-label", /outside selected period/);
   await expect(year.locator('rect[data-date="2026-12-31"][data-outside-range="true"]')).toHaveCount(1);
   await expect(year.getByText("Jan", { exact: true })).toBeVisible();
   await expect(year.getByText("Dec", { exact: true })).toBeVisible();

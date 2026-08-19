@@ -432,7 +432,13 @@
           </div>
 
           <div class="overflow-hidden">
-            <div data-testid="heatmap" x-html="renderHeatmap()" class="space-y-2"></div>
+            <div
+              data-testid="heatmap"
+              x-html="renderHeatmap()"
+              class="space-y-2"
+              @mouseover="heatmapHover($event)"
+              @mouseout="heatmapLeave($event)"
+            ></div>
           </div>
         </section>
 
